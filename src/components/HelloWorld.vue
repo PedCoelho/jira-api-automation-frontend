@@ -2,41 +2,99 @@
   <div class="hello">
     <h1>{{ msg }}</h1>
     <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
+      Selecione um projeto abaixo
     </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+    <multiselect
+      class="multisel"
+      v-model="selected"
+      trackBy="key"
+      label="name"
+      valueProp="key"
+      :disabled="isLoading"
+      :loading="isLoading"
+      multiple="false"
+      :searchable="true"
+      :allow-empty="false"
+      :options="projects"
+    >
+    </multiselect>
+    <div class="pre-wrapper">
+      <pre :class="{ error: status == 'error', ok: status == 'ok' }">{{
+        response
+      }}</pre>
+    </div>
   </div>
 </template>
-
+<style src="@vueform/multiselect/themes/default.css"></style>
 <script>
+import Multiselect from "@vueform/multiselect";
 export default {
-  name: 'HelloWorld',
+  name: "HelloWorld",
+  components: {
+    Multiselect,
+  },
+  data() {
+    return {
+      isLoading: false,
+      projects: ["default"],
+      selected: undefined,
+      response: "",
+      status: "",
+    };
+  },
+  watch: {
+    selected(val) {
+      if (val) {
+        this.fetchSprintReport(val);
+      }
+    },
+  },
   props: {
-    msg: String
-  }
-}
+    msg: String,
+  },
+  beforeMount() {
+    this.fetchProjects();
+  },
+  methods: {
+    async fetchProjects() {
+      this.isLoading = true;
+      let data = await fetch(
+        "https://jira-automation-experiment.herokuapp.com/getprojects"
+      ).then((x) => {
+        return x.json();
+      });
+      console.log(data);
+      this.projects = data;
+      this.isLoading = false;
+    },
+    async fetchSprintReport() {
+      this.isLoading = true;
+      this.response = "";
+      this.status = "";
+      let data = await fetch(
+        `https://jira-automation-experiment.herokuapp.com/getsprintreport/${this.selected}`
+      )
+        .then((x) => {
+          if (x.ok) {
+            return x.json();
+          } else throw new Error("Sem dados para exibição");
+        })
+        .then((x) => {
+          this.status = "ok";
+
+          this.response = JSON.stringify(x, null, 2);
+        })
+        .catch((e) => {
+          this.status = "error";
+          this.response = e.message;
+          return;
+        });
+      this.isLoading = false;
+
+      console.log(data);
+    },
+  },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -44,15 +102,30 @@ export default {
 h3 {
   margin: 40px 0 0;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+div.pre-wrapper {
+  display: flex;
+  max-width: 100%;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
+pre {
+  text-align: initial;
+  max-width: 70%;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  border-radius: 4px;
 }
-a {
-  color: #42b983;
+.ok {
+  padding: 1rem;
+}
+.error {
+  color: Red;
+  padding: 0.3rem 0.5rem;
+
+  border: 2px solid red;
+}
+.multisel {
+  max-width: 35%;
 }
 </style>
