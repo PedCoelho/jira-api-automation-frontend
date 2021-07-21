@@ -1,20 +1,37 @@
 <template>
   <img
+    @keypress.m="meow = !meow"
+    tabindex="0"
     class="rounded"
-    alt="SPASSU logo"
-    src="https://mir-s3-cdn-cf.behance.net/projects/404/d3d36636282889.Y3JvcCw0MDQsMzE2LDAsMA.jpg"
+    :alt="!meow ? 'SPASSU logo' : 'Meow!'"
+    :src="logo_url"
   />
-  <HelloWorld msg="Gerador de relatório de sprint" />
+  <CatGrid v-if="meow" />
+  <ReportGen v-else msg="Gerador de relatório de sprint" />
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import ReportGen from "./components/ReportGen.vue";
+import CatGrid from "./components/CatGrid.vue";
 
 export default {
   name: "App",
 
   components: {
-    HelloWorld,
+    ReportGen,
+    CatGrid,
+  },
+  data() {
+    return {
+      meow: false,
+    };
+  },
+  computed: {
+    logo_url() {
+      return this.meow
+        ? require("./assets/cat-thumb.jpg")
+        : require("./assets/spassu-logo.jpg");
+    },
   },
 };
 </script>
