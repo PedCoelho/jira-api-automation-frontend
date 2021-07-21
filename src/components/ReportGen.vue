@@ -136,19 +136,19 @@ export default {
         },
         {
           "Detalhes da Sprint ": "Sprint ",
-          "": sprint.name,
+          "": sprint.name || "",
         },
         {
           "Detalhes da Sprint ": "Período ",
-          "": sprint.parsedDates.period,
+          "": sprint.parsedDates.period || "",
         },
         {
           "Detalhes da Sprint ": "Objetivo ",
-          "": sprint.goal,
+          "": sprint.goal || "",
         },
         {
           "Detalhes da Sprint ": "Reunião de Entrega",
-          "": sprint.parsedDates.completedDate,
+          "": sprint.parsedDates.completedDate || "",
         },
         {
           "Detalhes da Sprint ": "STATUS FINAL ",
@@ -167,15 +167,15 @@ export default {
         let issueObjs = [
           {
             "Detalhes da Sprint ": "História ",
-            "": issue.summary,
+            "": issue.summary || "",
           },
           {
             "Detalhes da Sprint ": "Dod ",
-            "": issue.description,
+            "": issue.description || "",
           },
           {
             "Detalhes da Sprint ": "Link - JIRA ",
-            "": issue.url,
+            "": issue.url || "",
           },
           {
             "Detalhes da Sprint ": "Status: ",
@@ -185,6 +185,7 @@ export default {
             "Detalhes da Sprint ": "Observações ",
             "": " --------- ",
           },
+          { "Detalhes da Sprint ": "", "": "" },
         ];
         acc = [...acc, ...issueObjs];
         return acc;
