@@ -170,7 +170,7 @@ export default {
             "": issue.summary || "",
           },
           {
-            "Detalhes da Sprint ": "Dod ",
+            "Detalhes da Sprint ": "Descrição ",
             "": issue.description || "",
           },
           {
